@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.utils import new_uuid, utc_now
+from app.rules.models import RoutingDecision
 from app.schemas.common import (
     FormInfo,
     JourneyRecord,
@@ -38,7 +39,7 @@ def build_journey_record(
     user_id,
     profile_id,
     session_id,
-    branch_key: str,
+    routing: RoutingDecision,
     profile: UserProfile,
     template: dict[str, object],
 ) -> JourneyRecord:
@@ -66,9 +67,11 @@ def build_journey_record(
         profile_id=profile_id,
         session_id=session_id,
         title=template["title"],
-        journey_type=JourneyTypeEnum(template["journey_type"]),
-        branch_key=branch_key,
+        journey_type=routing.journey_type,
+        branch_key=routing.branch_key,
         summary=template["summary"],
+        branch_summary=routing.branch_summary,
+        derived_flags=routing.derived_flags,
         status=determine_journey_status(steps),
         state=profile.state,
         language=profile.language,

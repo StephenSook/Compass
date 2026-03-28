@@ -15,22 +15,20 @@ FORM_NUMBER_PATTERN = re.compile(r"\b([A-Z]{1,3}-\d{2,4})\b")
 
 def present_onboard_response(journey: JourneyRecord) -> OnboardResponse:
     next_step = _next_step_title(journey)
+    branch_summary = {
+        "branch_key": journey.branch_key,
+        "journey_type": _enum_value(journey.journey_type),
+        "state": journey.state,
+        "language": journey.language,
+        **journey.branch_summary,
+    }
     return OnboardResponse(
         user_id=str(journey.user_id),
         profile_id=str(journey.profile_id),
         journey_id=str(journey.id),
         journey_type=_enum_value(journey.journey_type),
-        branch_summary={
-            "branch_key": journey.branch_key,
-            "goal": _enum_value(journey.user_profile.goal),
-            "state": journey.state,
-            "county": journey.user_profile.county,
-            "language": journey.language,
-            "immigration_status": journey.user_profile.immigration_status,
-            "has_ssn": journey.user_profile.has_ssn,
-            "has_us_license": journey.user_profile.has_us_license,
-            "has_foreign_license": journey.user_profile.has_foreign_license,
-        },
+        branch_summary=branch_summary,
+        derived_flags=dict(journey.derived_flags),
         next_action=next_step or "Review the generated journey steps.",
     )
 

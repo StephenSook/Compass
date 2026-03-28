@@ -59,6 +59,9 @@ class OnboardResponse(CompassBaseModel):
     journey_id: NonEmptyStr = Field(description="Identifier for the generated journey.")
     journey_type: NonEmptyStr = Field(description="High-level journey family selected for the user.")
     branch_summary: dict[str, Any] = Field(
-        description="Structured summary of the branch decision and important profile signals."
+        description="Structured summary of the branch decision, readable branch key, and important profile signals."
+    )
+    derived_flags: dict[str, Any] = Field(
+        description="Deterministic flags derived from onboarding answers for frontend logic and UI hints."
     )
     next_action: NonEmptyStr = Field(description="Single best next action the frontend should emphasize.")

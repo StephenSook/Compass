@@ -118,6 +118,8 @@ class JourneyRecord(CompassBaseModel):
     journey_type: JourneyTypeEnum
     branch_key: NonEmptyStr
     summary: NonEmptyStr
+    branch_summary: dict[str, Any] = Field(default_factory=dict)
+    derived_flags: dict[str, Any] = Field(default_factory=dict)
     status: JourneyStatusEnum
     state: NonEmptyStr
     language: NonEmptyStr
