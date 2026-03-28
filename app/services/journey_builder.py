@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 from app.core.utils import new_uuid, utc_now
-from app.schemas.common import FormInfo, JourneyRecord, JourneyStep, OfficeInfo, ProgressSummary, UserProfile
+from app.schemas.common import (
+    FormInfo,
+    JourneyRecord,
+    JourneyStatusEnum,
+    JourneyStep,
+    JourneyTypeEnum,
+    OfficeInfo,
+    ProgressSummary,
+    UserProfile,
+)
 
 
 def build_progress_summary(steps: list[JourneyStep]) -> ProgressSummary:
     total_steps = len(steps)
-    completed_steps = sum(1 for step in steps if step.status == "completed")
+    completed_steps = sum(1 for step in steps if step.status == JourneyStatusEnum.COMPLETED)
     percent_complete = int((completed_steps / total_steps) * 100) if total_steps else 0
     return ProgressSummary(
         total_steps=total_steps,
@@ -15,7 +24,19 @@ def build_progress_summary(steps: list[JourneyStep]) -> ProgressSummary:
     )
 
 
+def determine_journey_status(steps: list[JourneyStep]) -> JourneyStatusEnum:
+    if not steps:
+        return JourneyStatusEnum.NOT_STARTED
+    if all(step.status == JourneyStatusEnum.COMPLETED for step in steps):
+        return JourneyStatusEnum.COMPLETED
+    if any(step.status in {JourneyStatusEnum.IN_PROGRESS, JourneyStatusEnum.COMPLETED} for step in steps):
+        return JourneyStatusEnum.IN_PROGRESS
+    return JourneyStatusEnum.NOT_STARTED
+
+
 def build_journey_record(
+    user_id,
+    profile_id,
     session_id,
     branch_key: str,
     profile: UserProfile,
@@ -36,18 +57,21 @@ def build_journey_record(
         for step_template in template["steps"]
     ]
     if steps:
-        steps[0] = steps[0].model_copy(update={"status": "in_progress"})
+        steps[0] = steps[0].model_copy(update={"status": JourneyStatusEnum.IN_PROGRESS})
 
     timestamp = utc_now()
     return JourneyRecord(
         id=new_uuid(),
+        user_id=user_id,
+        profile_id=profile_id,
         session_id=session_id,
         title=template["title"],
-        journey_type=template["journey_type"],
+        journey_type=JourneyTypeEnum(template["journey_type"]),
         branch_key=branch_key,
         summary=template["summary"],
+        status=determine_journey_status(steps),
         state=profile.state,
-        preferred_language=profile.preferred_language,
+        language=profile.language,
         user_profile=profile,
         steps=steps,
         progress=build_progress_summary(steps),

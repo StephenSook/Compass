@@ -5,7 +5,7 @@ from uuid import UUID
 from app.core.exceptions import JourneyNotFoundError
 from app.core.utils import new_uuid, utc_now
 from app.repositories.base import SessionRepository
-from app.schemas.common import SessionRecord, SessionTurn
+from app.schemas.common import ChatRoleEnum, SessionRecord, SessionTurn
 
 
 class SessionService:
@@ -21,7 +21,7 @@ class SessionService:
     def append_conversation(self, journey_id: UUID, question: str, answer: str) -> SessionRecord:
         timestamp = utc_now()
         turns = [
-            SessionTurn(id=new_uuid(), role="user", message=question, created_at=timestamp),
-            SessionTurn(id=new_uuid(), role="assistant", message=answer, created_at=timestamp),
+            SessionTurn(id=new_uuid(), role=ChatRoleEnum.USER, message=question, created_at=timestamp),
+            SessionTurn(id=new_uuid(), role=ChatRoleEnum.ASSISTANT, message=answer, created_at=timestamp),
         ]
         return self.session_repository.append_turns(journey_id, turns)

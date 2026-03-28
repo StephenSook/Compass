@@ -58,6 +58,7 @@ uvicorn app.main:app --reload
         ├── journey_builder.py
         ├── journey_service.py
         ├── onboarding_service.py
+        ├── presenters.py
         └── session_service.py
 ```
 
@@ -121,11 +122,12 @@ Example request:
   "state": "Georgia",
   "county": "Fulton",
   "city": "Atlanta",
-  "goal": "Georgia driver's license",
-  "preferred_language": "en",
+  "language": "en",
+  "goal": "ga_drivers_license",
   "age": 24,
   "has_ssn": true,
   "has_us_license": false,
+  "has_foreign_license": true,
   "foreign_license_country": "Brazil",
   "immigration_status": "F-1 student"
 }
@@ -149,18 +151,14 @@ Example request:
 
 ### `PATCH /api/v1/journeys/{journey_id}/progress`
 
-Updates checklist completion state for one or more steps.
+Updates checklist completion state for a single step.
 
 Example request:
 
 ```json
 {
-  "step_updates": [
-    {
-      "step_id": "11111111-1111-1111-1111-111111111111",
-      "completed": true
-    }
-  ]
+  "step_id": "11111111-1111-1111-1111-111111111111",
+  "completed": true
 }
 ```
 

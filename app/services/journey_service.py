@@ -4,9 +4,9 @@ from uuid import UUID
 
 from app.core.exceptions import InvalidProgressUpdateError, JourneyNotFoundError
 from app.repositories.base import JourneyRepository
-from app.schemas.common import JourneyRecord, StepStatus
+from app.schemas.common import JourneyRecord, JourneyStatusEnum
 from app.schemas.journey import ProgressUpdateRequest
-from app.services.journey_builder import build_progress_summary
+from app.services.journey_builder import build_progress_summary, determine_journey_status
 
 
 class JourneyService:
@@ -21,36 +21,41 @@ class JourneyService:
 
     def update_progress(self, journey_id: UUID, payload: ProgressUpdateRequest) -> JourneyRecord:
         journey = self.get_journey(journey_id)
-        updates_by_step_id = {update.step_id: update.completed for update in payload.step_updates}
-
-        if len(updates_by_step_id) != len(payload.step_updates):
-            raise InvalidProgressUpdateError("Duplicate step ids are not allowed in one progress update.")
-
-        known_step_ids = {step.id for step in journey.steps}
-        unknown_step_ids = [str(step_id) for step_id in updates_by_step_id if step_id not in known_step_ids]
-        if unknown_step_ids:
-            raise InvalidProgressUpdateError(
-                f"Unknown step ids for this journey: {', '.join(unknown_step_ids)}."
-            )
+        try:
+            target_step_id = UUID(payload.step_id)
+        except ValueError as exc:
+            raise InvalidProgressUpdateError("step_id must be a valid UUID string.") from exc
 
         updated_steps = []
+        step_found = False
         for step in journey.steps:
-            if step.id in updates_by_step_id:
-                status = StepStatus.COMPLETED if updates_by_step_id[step.id] else StepStatus.NOT_STARTED
+            if step.id == target_step_id:
+                step_found = True
+                status = JourneyStatusEnum.COMPLETED if payload.completed else JourneyStatusEnum.NOT_STARTED
                 updated_steps.append(step.model_copy(update={"status": status}))
             else:
                 updated_steps.append(step)
 
-        if updated_steps and all(step.status != StepStatus.IN_PROGRESS for step in updated_steps):
+        if not step_found:
+            raise InvalidProgressUpdateError(f"Unknown step id for this journey: {payload.step_id}.")
+
+        if updated_steps and not all(step.status == JourneyStatusEnum.COMPLETED for step in updated_steps):
+            updated_steps = [
+                step.model_copy(update={"status": JourneyStatusEnum.NOT_STARTED})
+                if step.status == JourneyStatusEnum.IN_PROGRESS
+                else step
+                for step in updated_steps
+            ]
             for index, step in enumerate(updated_steps):
-                if step.status != StepStatus.COMPLETED:
-                    updated_steps[index] = step.model_copy(update={"status": StepStatus.IN_PROGRESS})
+                if step.status != JourneyStatusEnum.COMPLETED:
+                    updated_steps[index] = step.model_copy(update={"status": JourneyStatusEnum.IN_PROGRESS})
                     break
 
         updated_journey = journey.model_copy(
             update={
                 "steps": updated_steps,
                 "progress": build_progress_summary(updated_steps),
+                "status": determine_journey_status(updated_steps),
             }
         )
         return self.journey_repository.update(updated_journey)
