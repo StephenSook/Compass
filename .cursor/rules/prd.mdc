@@ -1,0 +1,259 @@
+---
+alwaysApply: false
+---
+
+# Compass PRD
+
+## Overview
+
+**Product Name:** FirstStep [file:1]  
+**Tagline:** Your First Guide to Every Government Process [file:1]
+
+Compass is an AI-powered web application that helps immigrants, first-generation families, visa holders, and relocators navigate government processes through personalized step-by-step guidance instead of generic search results. [file:1]  
+The product asks users who they are, where they are, what they are trying to do, and what language they prefer, then generates a customized checklist with the exact documents, forms, costs, office locations, and timelines relevant to their situation. [file:1]  
+The launch focus is Metro Atlanta, Georgia, and the first two journey families are Georgia Driver’s License and Visa & Passport Navigator. [file:1]
+
+### Problem
+
+Users currently face fragmented government systems where each process lives on a different website, uses different terminology, requires different documents, and changes depending on the person’s situation. [file:1]  
+This often leads to conflicting answers, wasted trips, incorrect forms, missed requirements, and serious delays or legal consequences. [file:1]  
+Government websites are built for compliance rather than for clear guidance tailored to individual users. [file:1]
+
+### Vision
+
+Compass aims to replace hours of Googling and guesswork with one clear, personalized path forward. [file:1]  
+The long-term vision extends beyond paperwork into broader support, including a future Know Your Rights module for users facing enforcement or constitutional-rights questions. [file:1]
+
+## Users and Jobs to Be Done
+
+Compass serves people navigating US government systems for the first time or without a strong support network. [file:1]  
+The brief identifies four primary user personas. [file:1]
+
+### Primary user personas
+
+- **New Immigrant:** Recently arrived in the US, needs basic documentation such as ID, SSN, and driver’s license, and may have limited English proficiency. [file:1]
+- **First-Gen Navigator:** A US-born child of immigrant parents who becomes the translator and guide for family government interactions. [file:1]
+- **Visa Holder:** A student, worker, or family-based visa holder who needs help understanding status, renewal timelines, rights, and consequences of mistakes. [file:1]
+- **Relocator:** Someone who moved to a new state and must learn that state’s specific process rules. [file:1]
+
+### Core jobs to be done
+
+- Help a user understand exactly what to do next for a government process. [file:1]
+- Show the correct documents, forms, offices, fees, and timelines for that user’s specific case. [file:1]
+- Answer follow-up questions in context rather than with generic search-style responses. [file:1]
+- Reduce the risk of user mistakes, wasted trips, and missed deadlines. [file:1]
+
+## Product Features
+
+### 1. Smart Onboarding Questionnaire
+
+The onboarding flow asks roughly 5–6 qualifying questions that determine the user’s exact situation. [file:1]  
+These questions include location, immigration status or situation, intended goal, and language preference. [file:1]  
+The onboarding output is a structured user profile that the backend uses to route the user into a personalized journey instead of a generic FAQ page. [file:1]
+
+**Functional requirements**
+- Collect state, county or local location, goal, and preferred language. [file:1]
+- Collect relevant branching information such as age, SSN status, US license status, foreign license status, and immigration pathway details when needed. [file:1]
+- Convert answers into a profile object for backend processing. [file:1]
+- Route the user into the correct journey branch immediately after submission. [file:1]
+
+### 2. Guided Journeys with Expandable Steps
+
+Each government process is broken into a clear checklist. [file:1]  
+Every step expands to show the exact document needed, the form number and link, the cost, the office address and hours, the estimated processing time, and a practical tip to avoid common mistakes. [file:1]  
+The frontend is expected to render this as a clean, expandable, step-by-step interface with checkboxes and progress tracking. [file:1]
+
+**Functional requirements**
+- Show ordered checklist steps. [file:1]
+- Allow expand/collapse interaction on each step. [file:1]
+- Display document, form, office, timeline, fee, and tip details. [file:1]
+- Support progress tracking for each journey. [file:1]
+
+### 3. AI-Powered Follow-Up Q&A
+
+After the checklist is generated, the user can ask follow-up questions in plain language. [file:1]  
+Examples in the brief include questions about proof of residency alternatives, foreign-license use, and USCIS processing time for Form I-765. [file:1]  
+The system should answer in the context of the user’s specific situation rather than giving a generic response. [file:1]
+
+**Functional requirements**
+- Accept follow-up questions from the frontend. [file:1]
+- Send the question plus conversation context to the backend. [file:1]
+- Return a contextual answer grounded in the relevant process data. [file:1]
+- Add cautionary language when professional legal advice is appropriate, especially for immigration-related issues. [file:1]
+- Avoid guessing if a requirement is uncertain. [file:1]
+
+### 4. Progress Tracking
+
+Supabase is intended to store journey progress as part of the core system architecture. [file:1]  
+This supports tracking completed steps, current journey state, and future saved-progress experiences across devices. [file:1]
+
+### 5. Multilingual Support
+
+Multilingual support is part of the product direction and is listed in the Pro plan and AI/ML ownership area. [file:1]  
+The system should therefore be designed so future checklist and Q&A output can be rendered in a user’s preferred language. [file:1]
+
+### 6. Future B2B / Nonprofit Features
+
+The B2B / Nonprofit tier includes a case-management dashboard for social workers, legal aid staff, and nonprofit navigators. [file:1]  
+That dashboard is expected to support tracking multiple clients’ journeys, generating reports, and providing priority support. [file:1]
+
+### 7. Roadmap: Know Your Rights
+
+The brief explicitly marks the Know Your Rights module as a roadmap feature rather than something to build for the demo deadline. [file:1]  
+Its purpose is to extend the product beyond paperwork into rights education and broader social impact. [file:1]
+
+## Journey Requirements
+
+### Journey 1: Georgia Driver’s License
+
+This journey begins when the user selects that they need a driver’s license in Georgia. [file:1]  
+The system then asks qualifying questions to determine the correct path. [file:1]
+
+**Required branching questions**
+- Does the user currently have a license from another US state. [file:1]
+- Does the user have a license from another country, and if so, which country. [file:1]
+- Is the user under 18. [file:1]
+- Does the user have a Social Security Number. [file:1]
+- What county is the user in. [file:1]
+
+**Branching rules**
+- A license from another US state should route the user into a transfer path with fewer requirements. [file:1]
+- A foreign license from South Korea, Germany, France, or Taiwan should be treated as a direct-transfer case. [file:1]
+- Most other foreign licenses should require full testing. [file:1]
+- Users under 18 should be routed through Joshua’s Law requirements. [file:1]
+- Users without an SSN should see different document requirements. [file:1]
+- County should be used to route users to the nearest DDS office and appointment link. [file:1]
+
+**Target checklist structure**
+1. Gather documents. [file:1]
+2. Complete online application. [file:1]
+3. Book DDS appointment. [file:1]
+4. Pass knowledge test. [file:1]
+5. Pass road skills test. [file:1]
+6. Pay fee. [file:1]
+7. Receive license. [file:1]
+
+**Sample detail expectations**
+- Required documents may include passport, visa, I-94, SSN card, and two proofs of Georgia residency. [file:1]
+- The fee for a Class C license is listed as $32. [file:1]
+- The product should show practical tips such as bringing two proofs of residency because many users are turned away when they bring only one. [file:1]
+- The temporary paper license is issued the same day and the hard card arrives by mail in 2–3 weeks in the sample flow. [file:1]
+
+### Journey 2: Visa & Passport Navigator
+
+This journey branches depending on what the user needs. [file:1]
+
+#### Branch A: US Passport
+
+The passport flow must distinguish first-time applications from renewals because DS-11 and DS-82 are different processes. [file:1]  
+The product should surface document requirements, acceptance-facility guidance, fees, timelines, and urgency rules. [file:1]
+
+**Passport requirements**
+- Required documents include a birth certificate or naturalization certificate, government-issued photo ID, and a compliant passport photo. [file:1]
+- New adult passport book pricing is listed as $165 plus a $30 execution fee. [file:1]
+- Renewal by mail is listed as $130. [file:1]
+- Processing options include routine 6–8 weeks, expedited 2–3 weeks for an additional $60, and urgent pathways via emergency appointments. [file:1]
+- The system should map users to local passport acceptance facilities in the Atlanta metro area. [file:1]
+
+#### Branch B: Visa Status & Immigration Pathways
+
+The AI should ask about the user’s current status and goal, then map them to the right pathway. [file:1]
+
+**Supported launch subflows**
+- F-1 Student to OPT. [file:1]
+- Family-Based Green Card Sponsor pathway. [file:1]
+- Visa Renewal / Extension. [file:1]
+
+**F-1 OPT requirements**
+- The journey should include Form I-765, a $410 filing fee, and filing approximately 90 days before graduation. [file:1]
+- It should note USCIS processing times of 3–5 months, the 90-day unemployment limit, the 24-month STEM OPT extension possibility, and the H-1B pathway context. [file:1]
+
+**Family-based pathway requirements**
+- Immediate relatives such as spouse, parent, or unmarried child under 21 are described as having no visa-number limit. [file:1]
+- Preference-category wait times can range from 2 to 20+ years depending on country of origin and relationship. [file:1]
+- Form I-130 is the starting point and is listed at a $535 filing fee. [file:1]
+- Concurrent filing with I-485 may be possible if the priority date is current. [file:1]
+
+**Visa renewal / extension requirements**
+- Form I-539 is listed for most nonimmigrant status extensions with a $370 filing fee. [file:1]
+- The product should warn users that they must file before their status expires. [file:1]
+- The journey should note that a biometrics appointment is required after filing. [file:1]
+
+## Technical Requirements
+
+### Stack
+
+The frontend stack is React, Vite, and Tailwind CSS. [file:1]  
+The backend stack is FastAPI in Python. [file:1]  
+The AI layer uses Google Gemini API. [file:1]  
+The database is Supabase on PostgreSQL. [file:1]  
+The knowledge layer uses structured JSON or Markdown containing curated process data. [file:1]  
+Deployment is planned for Vercel on the frontend and Railway or Render on the backend. [file:1]
+
+### System flow
+
+1. User opens Compass and completes onboarding with location, situation, goal, and language preference. [file:1]
+2. Frontend sends the user profile to the FastAPI backend. [file:1]
+3. Backend queries the knowledge base for the relevant process data. [file:1]
+4. Backend sends user profile, knowledge-base context, and system prompt to Gemini to generate a personalized checklist with conditional logic applied. [file:1]
+5. Frontend renders the checklist as an expandable UI with progress and details. [file:1]
+6. User asks a follow-up question, and the backend returns an answer in the context of that user’s specific situation. [file:1]
+
+### Backend responsibilities
+
+The backend owner in the brief is responsible for FastAPI server setup, API endpoints, Gemini integration, Supabase schema and connection, user profile storage, journey progress state management, and deployment. [file:1]  
+The named core endpoints in the brief are `POST /onboard`, `GET /journey`, and `POST /ask`. [file:1]
+
+### Data requirements
+
+The knowledge base must include verified government-process data such as exact documents, forms, fees, offices, and timelines for both launch journeys. [file:1]  
+This grounding layer exists specifically to reduce hallucination risk for critical legal and procedural information. [file:1]
+
+## Business Model, Success Metrics, and Roadmap
+
+### Pricing
+
+The product uses a three-tier pricing model. [file:1]
+
+| Tier | Price | Includes |
+|---|---|---|
+| Free | $0 | 1 active journey at a time, basic checklist, community-sourced tips. [file:1] |
+| Pro | $9.99/month | Unlimited active journeys, AI follow-up Q&A, document deadline reminders, progress saved across devices, multilingual support. [file:1] |
+| B2B / Nonprofit | $49/month per seat | Case management dashboard, multi-client tracking, reports, and priority support. [file:1] |
+
+### Launch scope
+
+**In scope**
+- Working onboarding flow. [file:1]
+- Personalized checklist generation. [file:1]
+- Expandable steps UI. [file:1]
+- Georgia Driver’s License journey. [file:1]
+- Visa & Passport Navigator journey. [file:1]
+- AI-powered follow-up Q&A. [file:1]
+
+**Out of scope for launch**
+- Multi-state expansion beyond the initial Georgia focus. [file:1]
+- Full B2B case-management implementation. [file:1]
+- Production-grade multilingual rollout. [file:1]
+- Know Your Rights implementation. [file:1]
+
+### Success metrics
+
+A successful launch should demonstrate a live, functional web app where onboarding, personalized checklist generation, and AI Q&A all work in real time. [file:1]  
+The brief also emphasizes collecting validation evidence from real users during the event, including 15+ documented reactions. [file:1]  
+Additional product metrics should include onboarding completion, checklist generation success, follow-up Q&A usage, and perceived clarity or confidence after use. [file:1]
+
+### Risks
+
+- Government process data may change or be incomplete, so the knowledge base must stay curated and verified. [file:1]
+- Immigration guidance is high-risk, so the product must avoid guessing and indicate when legal advice is recommended. [file:1]
+- Scope can expand quickly, so launch should remain focused on the two defined journey families. [file:1]
+
+### Future roadmap
+
+- Add more government journeys. [file:1]
+- Expand to more states and cities beyond Atlanta. [file:1]
+- Add multilingual support. [file:1]
+- Add deadline reminders. [file:1]
+- Add B2B case-management workflows. [file:1]
+- Add the Know Your Rights module. [file:1]
