@@ -263,13 +263,17 @@ def ask_journey(
     except JourneyNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
-    answer = container.ai_service.answer_question(journey=journey, session=session, question=payload.question)
-    container.session_service.append_conversation(journey_id, payload.question, answer)
+    response_payload = container.ai_service.generate_response(
+        journey=journey,
+        session=session,
+        question=payload.question,
+    )
+    container.session_service.append_conversation(journey_id, payload.question, response_payload["answer"])
     return present_ask_response(
-        answer=answer,
-        citations=container.ai_service.build_citations(journey),
-        legal_warning=container.ai_service.needs_legal_caution(journey, payload.question),
-        recommended_next_step=container.ai_service.recommended_next_step(journey),
+        answer=response_payload["answer"],
+        citations=response_payload["citations"],
+        legal_warning=response_payload["legal_warning"],
+        recommended_next_step=response_payload["recommended_next_step"],
     )
 
 
