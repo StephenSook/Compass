@@ -7,6 +7,50 @@ import DanceText from '../components/DanceText'
 import StarButton from '../components/StarButton'
 import AnimatedUnderline from '../components/AnimatedUnderline'
 import CountUp from '../components/CountUp'
+import PricingCard from '../components/PricingCard'
+
+const pricingPlans = [
+  {
+    name: 'Free',
+    description: 'Get started with one journey at a time.',
+    price: '0',
+    features: [
+      '1 active journey at a time',
+      'Basic step-by-step checklist',
+      'Community-sourced tips',
+      'Progress tracking',
+    ],
+    buttonText: 'Start Free',
+  },
+  {
+    name: 'Pro',
+    description: 'Unlimited journeys with AI-powered assistance.',
+    price: '9.99',
+    features: [
+      'Unlimited active journeys',
+      'AI follow-up Q&A',
+      'Document deadline reminders',
+      'Progress saved across devices',
+      'Multilingual support',
+    ],
+    buttonText: 'Get Pro',
+    isPopular: true,
+  },
+  {
+    name: 'B2B / Nonprofit',
+    description: 'For social workers, legal aid staff, and nonprofit navigators.',
+    price: '49',
+    features: [
+      'Case management dashboard',
+      'Track multiple client journeys',
+      'Generate reports',
+      'Priority support',
+      'Per-seat licensing',
+    ],
+    buttonText: 'Contact Us',
+    priceLabel: '/mo per seat',
+  },
+]
 
 const features = [
   {
@@ -176,6 +220,32 @@ export default function Landing() {
               </motion.div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section style={{ width: '100%', padding: '6rem 1.5rem', background: '#F7FAFC' }}>
+        <div style={{ width: '100%', maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            style={{ marginBottom: '3.5rem', textAlign: 'center' }}
+          >
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 700, color: '#0F1B2D', marginBottom: '1rem', fontStyle: 'italic', textAlign: 'center' }}>
+              Choose your <AnimatedUnderline delay={0.15}>path forward</AnimatedUnderline>
+            </h2>
+            <p style={{ color: '#6b7280', fontSize: '1.25rem', maxWidth: '580px', margin: '0 auto', textAlign: 'center' }}>
+              Start free, upgrade when you need more. Every plan includes progress tracking and verified information.
+            </p>
+          </motion.div>
+
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '1.5rem', justifyContent: 'center', alignItems: 'stretch', flexWrap: 'wrap' }}>
+            {pricingPlans.map((plan, i) => (
+              <PricingCard key={plan.name} plan={plan} index={i} isPopular={plan.isPopular} />
+            ))}
+          </div>
         </div>
       </section>
 
