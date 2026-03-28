@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,8 +22,13 @@ class Settings(BaseSettings):
     )
     gemini_api_key: str = ""
     gemini_model: str = "gemini-1.5-flash"
+    data_backend: Literal["memory", "supabase"] = "memory"
     supabase_url: str = ""
     supabase_anon_key: str = ""
+    supabase_service_key: str = ""
+    supabase_journeys_table: str = "journeys"
+    supabase_sessions_table: str = "sessions"
+    supabase_payload_column: str = "payload"
     postgres_dsn: str = ""
 
 

@@ -8,7 +8,7 @@ This repository now includes a production-style FastAPI backend for Compass with
 
 - FastAPI on Python 3.11+
 - Pydantic v2 schemas
-- In-memory repositories for journeys and sessions
+- In-memory repositories for journeys and sessions, with optional Supabase-backed repositories
 - Deterministic onboarding and mock grounded Q&A flows
 - CORS configured for local frontend development
 - UUID-based identifiers throughout
@@ -94,8 +94,13 @@ Once the server is running:
 - `ALLOWED_ORIGINS`: JSON array of local frontend origins allowed by CORS
 - `GEMINI_API_KEY`: reserved for future Gemini integration
 - `GEMINI_MODEL`: default Gemini model name for future use
-- `SUPABASE_URL`: reserved for future Supabase integration
-- `SUPABASE_ANON_KEY`: reserved for future Supabase integration
+- `DATA_BACKEND`: `memory` or `supabase`
+- `SUPABASE_URL`: Supabase project HTTPS URL
+- `SUPABASE_ANON_KEY`: optional public key
+- `SUPABASE_SERVICE_KEY`: recommended server-side key for backend persistence
+- `SUPABASE_JOURNEYS_TABLE`: table used for journey records
+- `SUPABASE_SESSIONS_TABLE`: table used for session records
+- `SUPABASE_PAYLOAD_COLUMN`: JSON column used to store the serialized record
 - `POSTGRES_DSN`: reserved for future direct PostgreSQL access
 
 ## API Endpoints
@@ -171,8 +176,24 @@ Returns the in-memory session history for a journey.
 - Launch journeys are included for Georgia driver's license, US passport, and visa-related flows from the product brief.
 - Onboarding branches users into realistic mock journeys based on their answers.
 - Follow-up answers are grounded in the stored journey context and add cautionary language for immigration-sensitive topics.
-- Data is stored only in memory, so restarting the server resets all journeys and sessions.
+- By default, data is stored only in memory, so restarting the server resets all journeys and sessions.
+
+## Supabase Mode
+
+To enable Supabase-backed persistence:
+
+1. Set `DATA_BACKEND="supabase"` in `.env`.
+2. Set `SUPABASE_URL` to your project URL, for example `https://your-project-ref.supabase.co`.
+3. Set `SUPABASE_SERVICE_KEY` for server-side access.
+4. Make sure your Supabase tables match the configured names.
+
+The current repository layer expects:
+
+- A `journeys` table with an `id` text-or-uuid primary key column and a `payload` JSON/JSONB column.
+- A `sessions` table with `id`, `journey_id`, and `payload` columns, where `journey_id` is unique for each journey session.
+
+Each row stores the full serialized Pydantic record in the configured payload column, which keeps the backend schema simple and lets the FastAPI models remain the source of truth.
 
 ## Future Integration Path
 
-The codebase is organized so you can replace the in-memory repositories with Supabase-backed repository implementations and swap the mock AI service with a Gemini client without rewriting the API routes.
+The codebase is organized so you can keep using the current API routes and services while switching between in-memory and Supabase-backed repositories through configuration.
