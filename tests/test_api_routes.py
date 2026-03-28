@@ -90,6 +90,53 @@ class ApiRoutesTests(unittest.TestCase):
         self.assertEqual(progress_response.status_code, 404)
         self.assertEqual(session_response.status_code, 404)
 
+    def test_openapi_examples_are_exposed_for_core_endpoints(self) -> None:
+        response = self.client.get("/openapi.json")
+
+        self.assertEqual(response.status_code, 200)
+        schema = response.json()
+        paths = schema["paths"]
+
+        onboard_post = paths["/api/v1/onboard"]["post"]
+        onboard_request_example = onboard_post["requestBody"]["content"]["application/json"]["examples"][
+            "ga_foreign_license_transfer"
+        ]["value"]
+        onboard_response_example = onboard_post["responses"]["201"]["content"]["application/json"]["example"]
+        self.assertEqual(onboard_request_example["state"], "GA")
+        self.assertEqual(onboard_request_example["foreign_license_country"], "France")
+        self.assertEqual(onboard_response_example["journey_type"], "ga_drivers_license")
+        self.assertEqual(onboard_response_example["branch_summary"]["license_path"], "foreign_reciprocity_transfer")
+
+        journey_get = paths["/api/v1/journeys/{journey_id}"]["get"]
+        journey_response_example = journey_get["responses"]["200"]["content"]["application/json"]["example"]
+        self.assertEqual(journey_response_example["title"], "Georgia Driver’s License")
+        self.assertEqual(journey_response_example["progress"]["percent"], 29)
+
+        ask_post = paths["/api/v1/journeys/{journey_id}/ask"]["post"]
+        ask_request_example = ask_post["requestBody"]["content"]["application/json"]["examples"][
+            "residency_proof_question"
+        ]["value"]
+        ask_response_example = ask_post["responses"]["200"]["content"]["application/json"]["example"]
+        self.assertEqual(
+            ask_request_example["question"],
+            "What if I don’t have a utility bill for proof of residency?",
+        )
+        self.assertEqual(ask_response_example["citations"][0]["source_key"], "ga_dds_residency_docs")
+
+        progress_patch = paths["/api/v1/journeys/{journey_id}/progress"]["patch"]
+        progress_request_example = progress_patch["requestBody"]["content"]["application/json"]["examples"][
+            "complete_first_step"
+        ]["value"]
+        progress_response_example = progress_patch["responses"]["200"]["content"]["application/json"]["example"]
+        self.assertEqual(progress_request_example, {"step_id": "step_1", "completed": True})
+        self.assertEqual(progress_response_example["steps"][0]["completed"], True)
+
+        session_get = paths["/api/v1/sessions/{journey_id}"]["get"]
+        session_response_example = session_get["responses"]["200"]["content"]["application/json"]["example"]
+        self.assertEqual(session_response_example["journey_id"], "jrny_123")
+        self.assertEqual(session_response_example["profile_summary"]["state"], "GA")
+        self.assertEqual(session_response_example["chat_history"][0]["role"], "user")
+
 
 if __name__ == "__main__":
     unittest.main()
