@@ -14,7 +14,7 @@ class ServiceContainer:
         self.ai_service = MockCompassAIService()
         self.journey_service = JourneyService(self.journey_repository)
         self.session_service = SessionService(self.session_repository)
-        self.onboarding_service = OnboardingService(self.journey_repository, self.session_repository)
+        self.onboarding_service = OnboardingService(self.journey_service, self.session_repository)
 
 
 @lru_cache

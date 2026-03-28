@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 from app.core.utils import new_uuid, utc_now
-from app.repositories.base import JourneyRepository, SessionRepository
-from app.rules.knowledge_base import get_journey_template
+from app.repositories.base import SessionRepository
 from app.rules.routing import build_session_title, route_onboarding
 from app.schemas.common import ChatRoleEnum, JourneyRecord, SessionRecord, SessionTurn, UserProfile
 from app.schemas.onboarding import OnboardRequest
-from app.services.journey_builder import build_journey_record
+from app.services.journey_service import JourneyService
 
 
 class OnboardingService:
-    def __init__(self, journey_repository: JourneyRepository, session_repository: SessionRepository) -> None:
-        self.journey_repository = journey_repository
+    def __init__(self, journey_service: JourneyService, session_repository: SessionRepository) -> None:
+        self.journey_service = journey_service
         self.session_repository = session_repository
 
     def onboard(self, payload: OnboardRequest) -> JourneyRecord:
@@ -20,9 +19,13 @@ class OnboardingService:
         user_id = new_uuid()
         profile_id = new_uuid()
         session_id = new_uuid()
-        template = get_journey_template(routing.template_key)
-        journey = build_journey_record(user_id, profile_id, session_id, routing, profile, template)
-        self.journey_repository.create(journey)
+        journey = self.journey_service.create_journey(
+            user_id=user_id,
+            profile_id=profile_id,
+            session_id=session_id,
+            profile=profile,
+            routing=routing,
+        )
 
         timestamp = utc_now()
         session = SessionRecord(

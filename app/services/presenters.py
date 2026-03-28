@@ -100,23 +100,14 @@ def present_session(journey: JourneyRecord, session: SessionRecord) -> SessionOu
 
 def _progress_payload(journey: JourneyRecord) -> dict[str, Any]:
     return {
-        "total_steps": journey.progress.total_steps,
         "completed_steps": journey.progress.completed_steps,
-        "percent_complete": journey.progress.percent_complete,
-        "remaining_steps": journey.progress.total_steps - journey.progress.completed_steps,
+        "total_steps": journey.progress.total_steps,
+        "percent": journey.progress.percent_complete,
     }
 
 
 def _disclaimer_for(journey: JourneyRecord) -> str:
-    if journey.journey_type == "visa":
-        return (
-            "Compass provides general guidance based on curated process data and your selected profile. "
-            "Immigration outcomes depend on individual facts, so get qualified legal advice if anything is unclear."
-        )
-    return (
-        "Compass provides general guidance based on curated process data. Always verify fees, office hours, "
-        "and official requirements before submitting paperwork or attending an appointment."
-    )
+    return "This tool provides guidance, not legal advice."
 
 
 def _next_step_title(journey: JourneyRecord) -> str | None:
