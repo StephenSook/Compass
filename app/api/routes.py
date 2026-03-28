@@ -19,7 +19,16 @@ from app.services.presenters import (
 router = APIRouter(prefix="/api/v1", tags=["Compass"])
 
 
-@router.post("/onboard", response_model=OnboardResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/onboard",
+    response_model=OnboardResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create onboarding journey",
+    description=(
+        "Validate onboarding input, route the user deterministically, create a journey, "
+        "persist checklist steps, and return the routing summary."
+    ),
+)
 def onboard(
     payload: OnboardRequest,
     container: ServiceContainer = Depends(get_container),
@@ -28,7 +37,12 @@ def onboard(
     return present_onboard_response(journey)
 
 
-@router.get("/journeys/{journey_id}", response_model=JourneyOut)
+@router.get(
+    "/journeys/{journey_id}",
+    response_model=JourneyOut,
+    summary="Get journey",
+    description="Load a stored journey, recompute progress from saved steps, and return the checklist view.",
+)
 def get_journey(
     journey_id: UUID,
     container: ServiceContainer = Depends(get_container),
@@ -40,7 +54,15 @@ def get_journey(
     return present_journey(journey)
 
 
-@router.post("/journeys/{journey_id}/ask", response_model=AskResponse)
+@router.post(
+    "/journeys/{journey_id}/ask",
+    response_model=AskResponse,
+    summary="Ask journey question",
+    description=(
+        "Generate a contextual mock answer using journey type, step context, profile details, "
+        "and question keywords, then append the exchange to session history."
+    ),
+)
 def ask_journey(
     journey_id: UUID,
     payload: AskRequest,
@@ -62,7 +84,12 @@ def ask_journey(
     )
 
 
-@router.patch("/journeys/{journey_id}/progress", response_model=JourneyOut)
+@router.patch(
+    "/journeys/{journey_id}/progress",
+    response_model=JourneyOut,
+    summary="Update step progress",
+    description="Update a single step completion state and return the refreshed journey progress summary.",
+)
 def update_journey_progress(
     journey_id: UUID,
     payload: ProgressUpdateRequest,
@@ -78,7 +105,12 @@ def update_journey_progress(
     return present_journey(journey)
 
 
-@router.get("/sessions/{journey_id}", response_model=SessionOut)
+@router.get(
+    "/sessions/{journey_id}",
+    response_model=SessionOut,
+    summary="Get session context",
+    description="Return the profile summary, current journey view, and stored chat history for a journey.",
+)
 def get_session(
     journey_id: UUID,
     container: ServiceContainer = Depends(get_container),

@@ -14,7 +14,6 @@ FORM_NUMBER_PATTERN = re.compile(r"\b([A-Z]{1,3}-\d{2,4})\b")
 
 
 def present_onboard_response(journey: JourneyRecord) -> OnboardResponse:
-    next_step = _next_step_title(journey)
     branch_summary = {
         "branch_key": journey.branch_key,
         "journey_type": _enum_value(journey.journey_type),
@@ -29,7 +28,7 @@ def present_onboard_response(journey: JourneyRecord) -> OnboardResponse:
         journey_type=_enum_value(journey.journey_type),
         branch_summary=branch_summary,
         derived_flags=dict(journey.derived_flags),
-        next_action=next_step or "Review the generated journey steps.",
+        next_action="generate_journey",
     )
 
 

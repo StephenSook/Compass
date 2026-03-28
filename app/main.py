@@ -13,6 +13,16 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    openapi_tags=[
+        {
+            "name": "Health",
+            "description": "Basic service health and readiness checks.",
+        },
+        {
+            "name": "Compass",
+            "description": "Onboarding, journeys, progress tracking, and contextual Q&A endpoints.",
+        },
+    ],
 )
 
 app.add_middleware(
@@ -24,9 +34,9 @@ app.add_middleware(
 )
 
 
-@app.get("/health", tags=["Health"])
+@app.get("/health", tags=["Health"], summary="Health check", description="Simple readiness check.")
 def healthcheck() -> dict[str, str]:
-    return {"status": "ok", "environment": settings.app_env}
+    return {"status": "ok"}
 
 
 app.include_router(api_router)
