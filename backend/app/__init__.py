@@ -1,0 +1,1 @@
+"""Compass FastAPI application package."""
